@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">AudioTest</string>
+    <string name="volume">Voume</string>
+    <string name="frequency">Frequency</string>
+    <string name="sound_on">ON</string>
+    <string name="octave">Octave</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="audio_in">ON</string>
+    <string name="rate">Sampling rate</string>
+    <string-array name="rate_list">
+        <item>8000</item>
+        <item>16000</item>
+        <item>32000</item>
+        <item>44100</item>
+        <item>48000</item>
+    </string-array>
+
+</resources>
