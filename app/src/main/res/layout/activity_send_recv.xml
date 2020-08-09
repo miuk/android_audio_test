@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SendRecvActivity">
+
+    <TextView
+        android:id="@+id/label_myhost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/myhost"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/myport"
+        app:layout_constraintBottom_toBottomOf="@+id/myport"/>
+
+    <TextView
+        android:id="@+id/myhost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@+id/label_myhost"
+        app:layout_constraintTop_toTopOf="@+id/myport"
+        app:layout_constraintBottom_toBottomOf="@+id/myport"
+        />
+
+    <TextView
+        android:id="@+id/label_myport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/port"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@+id/myhost"
+        app:layout_constraintTop_toTopOf="@+id/myport"
+        app:layout_constraintBottom_toBottomOf="@+id/myport"
+        />
+
+    <EditText
+        android:id="@+id/myport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:ems="3"
+        android:inputType="number"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/label_myport"/>
+
+    <TextView
+        android:id="@+id/label_peerhost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/peerhost"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/peerhost"
+        app:layout_constraintBottom_toBottomOf="@+id/peerhost"/>
+
+    <EditText
+        android:id="@+id/peerhost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:ems="8"
+        android:inputType="text"
+        app:layout_constraintStart_toEndOf="@+id/label_peerhost"
+        app:layout_constraintTop_toBottomOf="@+id/myport"/>
+
+    <TextView
+        android:id="@+id/label_peerport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/port"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@+id/peerhost"
+        app:layout_constraintTop_toTopOf="@+id/peerhost"
+        app:layout_constraintBottom_toBottomOf="@+id/peerhost" />
+
+    <EditText
+        android:id="@+id/peerport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:ems="3"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/label_peerport"
+        app:layout_constraintTop_toTopOf="@+id/peerhost"
+        app:layout_constraintBottom_toBottomOf="@+id/peerhost"/>
+
+    <ToggleButton
+        android:id="@+id/sendrecv_on"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/peerhost"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

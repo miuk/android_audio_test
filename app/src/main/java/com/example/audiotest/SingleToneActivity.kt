@@ -12,7 +12,8 @@ import kotlinx.android.synthetic.main.activity_single_tone.*
 
 class SingleToneActivity : AppCompatActivity() {
 
-    val audioPlay = AudioPlay()
+    val audioPlay = AudioPlay(44100, 100)
+    val singleToneProvider = SingleToneProvider(44100)
 
     var curTone = "A"
     var toneFreqMap = mutableMapOf<String,Double>(
@@ -27,6 +28,8 @@ class SingleToneActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_single_tone)
+
+        audioPlay.dataProvider = singleToneProvider
 
         volume.min = 0
         volume.max = 100
@@ -44,11 +47,11 @@ class SingleToneActivity : AppCompatActivity() {
 
         frequency.min = 100
         frequency.max = 10000
-        frequency.progress = audioPlay.frequency.toInt()
+        frequency.progress = singleToneProvider.frequency
         frequency.setOnSeekBarChangeListener(
             object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                    setFrequency(progress.toDouble())
+                    setFrequency(progress)
                 }
 
                 override fun onStartTrackingTouch(p0: SeekBar?) {}
@@ -78,7 +81,7 @@ class SingleToneActivity : AppCompatActivity() {
         }
 
         setVolume(volume.progress)
-        setFrequency(audioPlay.frequency)
+        setFrequency(singleToneProvider.frequency)
         makeToneSet(0)
         val minv =AudioTrack.getMaxVolume()
         val maxv = AudioTrack.getMinVolume()
@@ -95,9 +98,9 @@ class SingleToneActivity : AppCompatActivity() {
         audioPlay.changeVolume(value)
     }
 
-    fun setFrequency(value: Double) {
+    fun setFrequency(value: Int) {
         value_frequency.text = value.toString()
-        audioPlay.changeFrequency(value)
+        singleToneProvider.frequency = value
     }
 
     fun makeToneSet(oct: Int) {

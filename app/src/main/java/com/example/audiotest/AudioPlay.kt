@@ -6,32 +6,43 @@ import android.media.AudioTrack
 import android.util.Log
 import kotlin.math.*;
 
-class AudioPlay {
+class AudioPlay(_sampleRate: Int, _frameRate: Int) {
 
-    var frequency = 440.0
+    interface DataProvider {
+        fun getAudioPlayData(len: Int): ShortArray
+    }
 
-    val rate = 44100
-    val bufsiz = rate / 10
-    val data = ShortArray(bufsiz)
-    var lastPhase = 0.0
-
-    val audioTrack = AudioTrack.Builder()
-        .setAudioAttributes(
-            AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build())
-        .setAudioFormat(
-            AudioFormat.Builder()
-                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                .setSampleRate(rate)
-                .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                .build())
-        .setBufferSizeInBytes(bufsiz*2)
-        .build()
+    val sampleRate = _sampleRate
+    val frameRate = _frameRate
+    private val samplesPerFrame = sampleRate * frameRate / 1000
+    private val bytesPerFrame = samplesPerFrame * 2
+    val bufsiz: Int
+    lateinit var dataProvider: DataProvider
+    var audioTrack: AudioTrack
 
     init {
         Log.i("AudioPlay", "init")
+        val minbufsiz = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        Log.i("AudioPlay", "init sampleRate=" + sampleRate.toString())
+        Log.i("AudioPlay", "init minbufsiz=" + minbufsiz.toString())
+        bufsiz = max(bytesPerFrame, minbufsiz)
+        AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        audioTrack = AudioTrack.Builder()
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build())
+            .setAudioFormat(
+                AudioFormat.Builder()
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                    .setSampleRate(sampleRate)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                    .build())
+            .setTransferMode(AudioTrack.MODE_STREAM)
+            .setBufferSizeInBytes(bufsiz*2)
+            .build()
+
         audioTrack.setPlaybackPositionUpdateListener(
             object: AudioTrack.OnPlaybackPositionUpdateListener {
                 override fun onPeriodicNotification(p0: AudioTrack?) {
@@ -39,7 +50,7 @@ class AudioPlay {
                 }
 
                 override fun onMarkerReached(p0: AudioTrack?) {
-                    fill()
+                    val data = dataProvider.getAudioPlayData(bufsiz)
                     val ret = audioTrack.write(data, 0, data.count(), AudioTrack.WRITE_BLOCKING)
                     audioTrack.notificationMarkerPosition = data.count()
                 }
@@ -50,10 +61,10 @@ class AudioPlay {
     fun start() {
         Log.i("AudioPlay", "start enter")
         for (i in 0..1) {
-            fill()
+            val data = dataProvider.getAudioPlayData(bufsiz)
             audioTrack.write(data, 0, data.count(), AudioTrack.WRITE_BLOCKING)
         }
-        audioTrack.notificationMarkerPosition = data.count()
+        audioTrack.notificationMarkerPosition = bufsiz
         audioTrack.play()
 
         Log.i("AudioPlay", "start leave")
@@ -64,25 +75,6 @@ class AudioPlay {
         audioTrack.pause()
         audioTrack.stop()
         audioTrack.flush()
-    }
-
-    fun fill() {
-        val omega = 2 * PI * frequency / rate
-        var p: Double = 0.0
-        for (i in 0 until data.count()) {
-            p = omega * i + lastPhase
-            val y = sin(p) * 32767.0
-            data[i] = y.toShort()
-        }
-        lastPhase = (p + omega).IEEErem(2 * PI)
-    }
-
-    fun changeFrequency(value: Double) {
-        frequency = value
-        if (audioTrack.playState == AudioTrack.PLAYSTATE_PLAYING) {
-            stop()
-            start()
-        }
     }
 
     fun changeVolume(value: Int) {

@@ -10,16 +10,16 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 import kotlin.math.max
 
-class AudioIn {
+class AudioIn(_sampleRate: Int, _frameRate: Int) {
 
     interface Updater {
         fun update(buf: ShortArray)
         fun changeRate(newRate: Int, newSamplesPerFrame: Int)
     }
 
-    val frameRate = 10
+    var frameRate = _frameRate
+    var sampleRate = _sampleRate
 
-    var sampleRate = 0
     var samplesPerFrame = 0
     private var bytesPerFrame = 0
     private var bufsiz = 0
@@ -30,17 +30,23 @@ class AudioIn {
     val q = LinkedBlockingDeque<ShortArray>()
     val updaters = ArrayList<Updater>()
 
-    fun changeRate(newRate: Int) {
-        if (sampleRate == newRate)
-            return
+    init {
+        calcSizes()
+    }
 
-        val bRecording = isRecording()
-        stop()
-
-        sampleRate = newRate
-        samplesPerFrame = sampleRate / frameRate
+    private fun calcSizes() {
+        samplesPerFrame = sampleRate * frameRate / 1000
         bytesPerFrame = samplesPerFrame * 2
         bufsiz = max(bytesPerFrame, AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT))
+    }
+
+    fun changeRate(newRate: Int) {
+        if (audioRec != null && sampleRate == newRate)
+            return
+        val bRecording = isRecording()
+        stop()
+        sampleRate = newRate
+        calcSizes()
         audioRec = AudioRecord(
             MediaRecorder.AudioSource.MIC,
             sampleRate,
@@ -73,6 +79,7 @@ class AudioIn {
     }
 
     private fun record() {
+        //Log.i("AudioIn", "record")
         val buf = ShortArray(samplesPerFrame)
         audioRec?.read(buf, 0, buf.count())
         q.put(buf)

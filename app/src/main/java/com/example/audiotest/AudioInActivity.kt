@@ -13,7 +13,7 @@ import kotlin.math.max
 
 class AudioInActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
-    val audioIn = AudioIn()
+    val audioIn = AudioIn(8000, 100)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

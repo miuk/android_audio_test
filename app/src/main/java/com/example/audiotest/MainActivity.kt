@@ -2,22 +2,22 @@ package com.example.audiotest
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.jar.Manifest
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
 
     val menuList = arrayOf(
         "Single Tone",
-        "Audio In"
+        "Audio In",
+        "Send Receive"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +45,15 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
         val clz = when(position) {
             0 -> SingleToneActivity::class.java
             1 -> AudioInActivity::class.java
+            2 -> SendRecvActivity::class.java
             else -> SingleToneActivity::class.java
         }
         startActivity(Intent(this, clz))
+    }
+
+    companion object {
+        init {
+            System.loadLibrary("udpsocket")
+        }
     }
 }
