@@ -11,14 +11,14 @@ import java.net.SocketException
 
 class SendRecv : AudioIn.Updater, AudioPlay.DataProvider {
 
-    var sock = 0
+    var udpsock = -1
     val q = Buffer()
 
     fun getMyIPv4Address(context: Context):String {
         var wifi_ip = ""
         var mobile_ip = ""
         try {
-            val interfaces = NetworkInterface.getNetworkInterfaces();
+            val interfaces = NetworkInterface.getNetworkInterfaces()
             if (interfaces == null) {
                 return "IPアドレス取得できませんでした。" + System.lineSeparator()
             }
@@ -62,7 +62,7 @@ class SendRecv : AudioIn.Updater, AudioPlay.DataProvider {
 
     override fun update(buf: ShortArray) {
         //Log.i("SendRecv", "update " + buf.size.toString())
-        sendUDPDatagram(sock, buf, buf.size)
+        sendUDPDatagram(udpsock, buf, buf.size)
     }
 
     fun received(buf: ShortArray) {
@@ -77,16 +77,16 @@ class SendRecv : AudioIn.Updater, AudioPlay.DataProvider {
     fun start(peerHost: String, strPeerPort: String, strMyPort: String): String {
         val peerPort = strPeerPort.toInt()
         val myPort = strMyPort.toInt()
-        sock = openUDPSocket(peerHost, peerPort, myPort)
-        if (sock < 0) {
+        udpsock = openUDPSocket(peerHost, peerPort, myPort)
+        if (udpsock < 0) {
             return "socket open failed"
         }
         return ""
     }
 
     fun stop() {
-        closeUDPSocket(sock)
-        sock = -1
+        closeUDPSocket(udpsock)
+        udpsock = -1
     }
 
     override fun getAudioPlayData(len: Int): ShortArray {
